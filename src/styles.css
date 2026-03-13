@@ -1,0 +1,84 @@
+/* -- Design Tokens ----------------------------------------------------------- */
+:root {
+  --color-up: #22c55e;
+  --color-degraded: #f59e0b;
+  --color-down: #ef4444;
+  --color-unknown: #94a3b8;
+
+  --color-up-bg: #f0fdf4;
+  --color-degraded-bg: #fffbeb;
+  --color-down-bg: #fef2f2;
+  --color-unknown-bg: #f8fafc;
+
+  --surface-card: var(--p-surface-card);
+  --border-radius: 0.5rem;
+  --transition-speed: 200ms;
+}
+
+/* -- Reset -------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--p-font-family);
+  background-color: var(--p-surface-ground);
+  color: var(--p-text-color);
+}
+
+/* -- Status Badge Utilities --------------------------------------------------- */
+/* Used by dashboard cards, endpoint detail, and anywhere a status is displayed.
+   Defined globally because multiple unrelated components share this pattern. */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge--up {
+  color: var(--color-up);
+  background-color: var(--color-up-bg);
+}
+
+.status-badge--degraded {
+  color: var(--color-degraded);
+  background-color: var(--color-degraded-bg);
+}
+
+.status-badge--down {
+  color: var(--color-down);
+  background-color: var(--color-down-bg);
+}
+
+.status-badge--unknown {
+  color: var(--color-unknown);
+  background-color: var(--color-unknown-bg);
+}
+
+/* -- Layout Utilities --------------------------------------------------------- */
+.page-content {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--p-surface-card);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--p-surface-border);
+  padding: 1.5rem;
+}
+
+/* -- Responsive --------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .page-content {
+    padding: 1rem;
+  }
+}
