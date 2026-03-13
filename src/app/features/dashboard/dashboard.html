@@ -1,0 +1,73 @@
+@if (isLoading()) {
+  <div class="dashboard__loading">
+    <p-progressSpinner strokeWidth="4" />
+    <p>Loading dashboard...</p>
+  </div>
+}
+
+@if (error()) {
+  <div class="dashboard__error">
+    <p>&#9888; {{ error() }}</p>
+  </div>
+}
+
+@if (!isLoading() && !error() && summary()) {
+  <!-- Summary bar -->
+  <div class="dashboard__summary">
+    <div class="summary-stat">
+      <span class="summary-stat__value">{{ summary()!.totalEndpoints }}</span>
+      <span class="summary-stat__label">Total</span>
+    </div>
+    <div class="summary-stat summary-stat--up">
+      <span class="summary-stat__value">{{ summary()!.upCount }}</span>
+      <span class="summary-stat__label">Up</span>
+    </div>
+    <div class="summary-stat summary-stat--degraded">
+      <span class="summary-stat__value">{{ summary()!.degradedCount }}</span>
+      <span class="summary-stat__label">Degraded</span>
+    </div>
+    <div class="summary-stat summary-stat--down">
+      <span class="summary-stat__value">{{ summary()!.downCount }}</span>
+      <span class="summary-stat__label">Down</span>
+    </div>
+  </div>
+
+  <!-- Endpoint grid -->
+  <div class="dashboard__grid">
+    @for (endpoint of endpoints(); track endpoint.id) {
+      <div class="endpoint-card"
+           [class.endpoint-card--up]="endpoint.currentStatus === EndpointStatus.Up"
+           [class.endpoint-card--degraded]="endpoint.currentStatus === EndpointStatus.Degraded"
+           [class.endpoint-card--down]="endpoint.currentStatus === EndpointStatus.Down">
+
+        <div class="endpoint-card__header">
+          <span [class]="'status-badge ' + getStatusDisplay(endpoint.currentStatus).cssClass">
+            {{ getStatusDisplay(endpoint.currentStatus).label }}
+          </span>
+        </div>
+
+        <div class="endpoint-card__body">
+          <h3 class="endpoint-card__name">{{ endpoint.name }}</h3>
+          <p class="endpoint-card__url">{{ endpoint.url }}</p>
+        </div>
+
+        <div class="endpoint-card__footer">
+          <div class="endpoint-card__stat">
+            <span class="endpoint-card__stat-label">Response</span>
+            <span class="endpoint-card__stat-value">
+              {{ endpoint.lastResponseTimeMs !== null ? endpoint.lastResponseTimeMs + "ms" : "-" }}
+            </span>
+          </div>
+          <div class="endpoint-card__stat">
+            <span class="endpoint-card__stat-label">Uptime 24h</span>
+            <span class="endpoint-card__stat-value">{{ endpoint.uptimeLast24Hours }}%</span>
+          </div>
+          <div class="endpoint-card__stat">
+            <span class="endpoint-card__stat-label">Last check</span>
+            <span class="endpoint-card__stat-value">{{ endpoint.lastCheckedAt | timeAgo }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
