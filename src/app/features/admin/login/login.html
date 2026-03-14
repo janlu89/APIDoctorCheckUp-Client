@@ -1,0 +1,38 @@
+<div class="login__wrapper">
+  <div class="login__card card">
+    <h1 class="login__title">Admin Login</h1>
+    <p class="login__subtitle">API Doctor CheckUp</p>
+
+    @if (error()) {
+      <p-message severity="error" [text]="error()!" styleClass="login__error" />
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="login__form">
+      <div class="login__field">
+        <label for="username">Username</label>
+        <input pInputText
+               id="username"
+               formControlName="username"
+               autocomplete="username"
+               placeholder="admin" />
+      </div>
+
+      <div class="login__field">
+        <label for="password">Password</label>
+        <p-password inputId="password"
+                    formControlName="password"
+                    [feedback]="false"
+                    [toggleMask]="true"
+                    autocomplete="current-password"
+                    placeholder="Password"
+                    styleClass="login__password" />
+      </div>
+
+      <p-button type="submit"
+                label="Sign in"
+                [loading]="isLoading()"
+                [disabled]="form.invalid"
+                styleClass="login__submit" />
+    </form>
+  </div>
+</div>
