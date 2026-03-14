@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://your-app.onrender.com',
-  hubUrl: 'https://your-app.onrender.com/hubs/monitor'
+  apiUrl: 'https://apidoctorcheckup-api.onrender.com',
+  hubUrl: 'https://apidoctorcheckup-api.onrender.com/hubs/monitor'
 };
