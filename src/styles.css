@@ -1,0 +1,66 @@
+:root {
+  --color-up: #22c55e;
+  --color-degraded: #f59e0b;
+  --color-down: #ef4444;
+  --color-unknown: #94a3b8;
+
+  --color-up-bg: #f0fdf4;
+  --color-degraded-bg: #fffbeb;
+  --color-down-bg: #fef2f2;
+  --color-unknown-bg: #f8fafc;
+
+  --border-radius: 0.5rem;
+  --transition-speed: 200ms;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--p-font-family, system-ui, sans-serif);
+  background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f0fdf4 100%);
+  background-attachment: fixed;
+  color: var(--p-text-color, #1f2937);
+  min-height: 100vh;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge--up       { color: var(--color-up);       background-color: var(--color-up-bg);       }
+.status-badge--degraded { color: var(--color-degraded); background-color: var(--color-degraded-bg); }
+.status-badge--down     { color: var(--color-down);     background-color: var(--color-down-bg);     }
+.status-badge--unknown  { color: var(--color-unknown);  background-color: var(--color-unknown-bg);  }
+
+.page-content {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.97) !important;
+  backdrop-filter: blur(8px);
+  border-radius: var(--border-radius) !important;
+  border: 1px solid rgba(200, 210, 255, 0.5) !important;
+  padding: 1.5rem;
+  box-shadow: 0 2px 16px rgba(99, 102, 241, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+@media (max-width: 768px) {
+  .page-content {
+    padding: 1rem;
+  }
+}
