@@ -1,4 +1,3 @@
-/* -- Design Tokens ----------------------------------------------------------- */
 :root {
   --color-up: #22c55e;
   --color-degraded: #f59e0b;
@@ -10,26 +9,23 @@
   --color-down-bg: #fef2f2;
   --color-unknown-bg: #f8fafc;
 
-  --surface-card: var(--p-surface-card);
   --border-radius: 0.5rem;
   --transition-speed: 200ms;
 }
 
-/* -- Reset -------------------------------------------------------------------- */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: var(--p-font-family);
-  background-color: var(--p-surface-ground);
-  color: var(--p-text-color);
+  font-family: var(--p-font-family, system-ui, sans-serif);
+  background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f0fdf4 100%);
+  background-attachment: fixed;
+  color: var(--p-text-color, #1f2937);
+  min-height: 100vh;
 }
 
-/* -- Status Badge Utilities --------------------------------------------------- */
-/* Used by dashboard cards, endpoint detail, and anywhere a status is displayed.
-   Defined globally because multiple unrelated components share this pattern. */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -42,27 +38,11 @@ body {
   letter-spacing: 0.05em;
 }
 
-.status-badge--up {
-  color: var(--color-up);
-  background-color: var(--color-up-bg);
-}
+.status-badge--up       { color: var(--color-up);       background-color: var(--color-up-bg);       }
+.status-badge--degraded { color: var(--color-degraded); background-color: var(--color-degraded-bg); }
+.status-badge--down     { color: var(--color-down);     background-color: var(--color-down-bg);     }
+.status-badge--unknown  { color: var(--color-unknown);  background-color: var(--color-unknown-bg);  }
 
-.status-badge--degraded {
-  color: var(--color-degraded);
-  background-color: var(--color-degraded-bg);
-}
-
-.status-badge--down {
-  color: var(--color-down);
-  background-color: var(--color-down-bg);
-}
-
-.status-badge--unknown {
-  color: var(--color-unknown);
-  background-color: var(--color-unknown-bg);
-}
-
-/* -- Layout Utilities --------------------------------------------------------- */
 .page-content {
   padding: 1.5rem;
   max-width: 1400px;
@@ -70,13 +50,15 @@ body {
 }
 
 .card {
-  background: var(--p-surface-card);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--p-surface-border);
+  background-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.97) !important;
+  backdrop-filter: blur(8px);
+  border-radius: var(--border-radius) !important;
+  border: 1px solid rgba(200, 210, 255, 0.5) !important;
   padding: 1.5rem;
+  box-shadow: 0 2px 16px rgba(99, 102, 241, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* -- Responsive --------------------------------------------------------------- */
 @media (max-width: 768px) {
   .page-content {
     padding: 1rem;
