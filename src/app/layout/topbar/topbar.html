@@ -1,0 +1,29 @@
+﻿<header class="topbar">
+  <a routerLink="/" class="topbar__brand">
+    <span class="topbar__logo">&#9877;</span>
+    <span class="topbar__title">API Doctor</span>
+  </a>
+
+  <div class="topbar__actions">
+    <span class="topbar__status-indicator"
+          [class.topbar__status-indicator--connected]="signalR.isConnected()">
+      {{ signalR.isConnected() ? "Live" : "Offline" }}
+    </span>
+
+    @if (auth.isAuthenticated()) {
+      <p-button label="Manage Endpoints"
+                severity="secondary"
+                size="small"
+                routerLink="/admin/endpoints" />
+      <p-button label="Logout"
+                severity="danger"
+                size="small"
+                (onClick)="logout()" />
+    } @else {
+      <p-button label="Admin"
+                severity="secondary"
+                size="small"
+                routerLink="/admin/login" />
+    }
+  </div>
+</header>

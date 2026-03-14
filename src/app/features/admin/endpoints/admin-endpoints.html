@@ -1,0 +1,142 @@
+<p-confirmDialog />
+
+<div class="admin__header">
+  <div>
+    <h1 class="admin__title">Manage Endpoints</h1>
+    <p class="admin__subtitle">Add, edit or remove monitored endpoints.</p>
+  </div>
+  <div class="admin__header-actions">
+    <p-button label="Add Endpoint"
+              icon="pi pi-plus"
+              (onClick)="openCreate()" />
+    <p-button label="Logout"
+              severity="secondary"
+              icon="pi pi-sign-out"
+              (onClick)="logout()" />
+  </div>
+</div>
+
+@if (successMsg()) {
+  <p-message severity="success" [text]="successMsg()!" styleClass="admin__message" />
+}
+@if (error()) {
+  <p-message severity="error" [text]="error()!" styleClass="admin__message" />
+}
+
+@if (isLoading()) {
+  <p class="admin__loading">Loading endpoints...</p>
+}
+
+@if (editingId() === 0) {
+  <div class="admin__form-panel card">
+    <h2 class="admin__form-title">New Endpoint</h2>
+    <ng-container *ngTemplateOutlet="endpointForm" />
+  </div>
+}
+
+@if (!isLoading()) {
+  <div class="admin__list">
+    @for (endpoint of endpoints(); track endpoint.id) {
+      <div class="admin-card card">
+        <div class="admin-card__header">
+          <div class="admin-card__info">
+            <span [class]="'status-badge ' + getStatusDisplay(endpoint.currentStatus).cssClass">
+              {{ getStatusDisplay(endpoint.currentStatus).label }}
+            </span>
+            <span class="admin-card__name">{{ endpoint.name }}</span>
+            @if (!endpoint.isActive) {
+              <span class="admin-card__inactive">Paused</span>
+            }
+          </div>
+          <div class="admin-card__actions">
+            <p-button label="Edit"
+                      severity="secondary"
+                      size="small"
+                      icon="pi pi-pencil"
+                      (onClick)="openEdit(endpoint)" />
+            <p-button label="Delete"
+                      severity="danger"
+                      size="small"
+                      icon="pi pi-trash"
+                      (onClick)="confirmDelete(endpoint)" />
+          </div>
+        </div>
+
+        <p class="admin-card__url">{{ endpoint.url }}</p>
+        <p class="admin-card__meta">
+          Checks every {{ endpoint.checkIntervalSeconds }}s
+          &nbsp;&middot;&nbsp;
+          Expects {{ endpoint.expectedStatusCode }}
+        </p>
+
+        @if (editingId() === endpoint.id) {
+          <div class="admin__form-panel admin__form-panel--inline">
+            <h2 class="admin__form-title">Edit Endpoint</h2>
+            <ng-container *ngTemplateOutlet="endpointForm" />
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+
+<ng-template #endpointForm>
+  <form [formGroup]="form" (ngSubmit)="save()" class="endpoint-form">
+    <div class="endpoint-form__grid">
+      <div class="endpoint-form__field">
+        <label>Name</label>
+        <input pInputText formControlName="name" placeholder="My API" />
+      </div>
+
+      <div class="endpoint-form__field endpoint-form__field--wide">
+        <label>URL</label>
+        <input pInputText formControlName="url" placeholder="https://api.example.com/health" />
+      </div>
+
+      <div class="endpoint-form__field">
+        <label>Expected status code</label>
+        <p-inputNumber formControlName="expectedStatusCode" [min]="100" [max]="599" />
+      </div>
+
+      <div class="endpoint-form__field">
+        <label>Check interval (seconds)</label>
+        <p-inputNumber formControlName="checkIntervalSeconds" [min]="30" suffix="s" />
+      </div>
+
+      <div class="endpoint-form__field">
+        <label>Warning threshold (ms)</label>
+        <p-inputNumber formControlName="responseTimeWarningMs" [min]="100" suffix="ms" />
+      </div>
+
+      <div class="endpoint-form__field">
+        <label>Critical threshold (ms)</label>
+        <p-inputNumber formControlName="responseTimeCriticalMs" [min]="100" suffix="ms" />
+      </div>
+
+      <div class="endpoint-form__field">
+        <label>Consecutive failures before Down</label>
+        <p-inputNumber formControlName="consecutiveFailuresDown" [min]="1" />
+      </div>
+
+      @if (editingId() !== 0) {
+        <div class="endpoint-form__field endpoint-form__field--checkbox">
+          <p-checkbox formControlName="isActive"
+                      [binary]="true"
+                      inputId="isActive" />
+          <label for="isActive">Active (uncheck to pause monitoring)</label>
+        </div>
+      }
+    </div>
+
+    <div class="endpoint-form__actions">
+      <p-button type="submit"
+                [label]="editingId() === 0 ? 'Create' : 'Save changes'"
+                [loading]="isSaving()"
+                [disabled]="form.invalid" />
+      <p-button type="button"
+                label="Cancel"
+                severity="secondary"
+                (onClick)="closePanel()" />
+    </div>
+  </form>
+</ng-template>

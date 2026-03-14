@@ -1,0 +1,127 @@
+﻿<div class="detail__back">
+  <a routerLink="/" class="detail__back-link">&#8592; Back to dashboard</a>
+</div>
+
+@if (isLoading()) {
+  <div class="detail__loading"><p>Loading endpoint details...</p></div>
+}
+
+@if (error()) {
+  <div class="detail__error"><p>&#9888; {{ error() }}</p></div>
+}
+
+@if (!isLoading() && !error() && endpoint()) {
+
+  <!-- Header -->
+  <div class="detail__header card">
+    <div class="detail__header-left">
+      <span [class]="'status-badge ' + getStatusDisplay(endpoint()!.currentStatus).cssClass">
+        {{ getStatusDisplay(endpoint()!.currentStatus).label }}
+      </span>
+      <h1 class="detail__name">{{ endpoint()!.name }}</h1>
+      <a [href]="endpoint()!.url" target="_blank" class="detail__url">
+        {{ endpoint()!.url }}
+      </a>
+    </div>
+    <div class="detail__header-meta">
+      <div class="meta-item">
+        <span class="meta-item__label">Check interval</span>
+        <span class="meta-item__value">{{ endpoint()!.checkIntervalSeconds }}s</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-item__label">Expected status</span>
+        <span class="meta-item__value">{{ endpoint()!.expectedStatusCode }}</span>
+      </div>
+      @if (endpoint()!.alertThreshold) {
+        <div class="meta-item">
+          <span class="meta-item__label">Warning threshold</span>
+          <span class="meta-item__value">{{ endpoint()!.alertThreshold!.responseTimeWarningMs }}ms</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-item__label">Critical threshold</span>
+          <span class="meta-item__value">{{ endpoint()!.alertThreshold!.responseTimeCriticalMs }}ms</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Uptime stats -->
+  @if (stats()) {
+    <div class="detail__stats">
+      <div class="stat-card card">
+        <span class="stat-card__label">Uptime 24h</span>
+        <span [class]="'stat-card__value ' + uptimeClass()">
+          {{ stats()!.uptimeLast24Hours }}%
+        </span>
+      </div>
+      <div class="stat-card card">
+        <span class="stat-card__label">Uptime 7d</span>
+        <span [class]="'stat-card__value ' + uptimeClass()">
+          {{ stats()!.uptimeLast7Days }}%
+        </span>
+      </div>
+      <div class="stat-card card">
+        <span class="stat-card__label">Uptime 30d</span>
+        <span [class]="'stat-card__value ' + uptimeClass()">
+          {{ stats()!.uptimeLast30Days }}%
+        </span>
+      </div>
+      <div class="stat-card card">
+        <span class="stat-card__label">Avg response</span>
+        <span class="stat-card__value">{{ stats()!.averageResponseTimeMs | number:'1.0-0' }}ms</span>
+      </div>
+      <div class="stat-card card">
+        <span class="stat-card__label">Total incidents</span>
+        <span class="stat-card__value">{{ stats()!.totalIncidents }}</span>
+      </div>
+      <div class="stat-card card">
+        <span class="stat-card__label">Open incidents</span>
+        <span [class]="'stat-card__value ' + (stats()!.openIncidents > 0 ? 'uptime--critical' : '')">
+          {{ stats()!.openIncidents }}
+        </span>
+      </div>
+    </div>
+  }
+
+  <!-- Response time chart -->
+  @if (chartData()) {
+    <div class="card detail__chart-card">
+      <h2 class="detail__section-title">Response Time &#8212; Last 50 Checks</h2>
+      <div class="detail__chart-container">
+        <p-chart type="line"
+                 [data]="chartData()"
+                 [options]="chartOptions"
+                 height="280px" />
+      </div>
+    </div>
+  }
+
+  <!-- Recent checks table -->
+  <div class="card detail__checks-card">
+    <h2 class="detail__section-title">Recent Checks</h2>
+    <div class="checks-table">
+      <div class="checks-table__header">
+        <span>Time</span>
+        <span>Status code</span>
+        <span>Response</span>
+        <span>Result</span>
+        <span>Error</span>
+      </div>
+      @for (check of checks(); track check.id) {
+        <div class="checks-table__row"
+             [class.checks-table__row--fail]="!check.isSuccess">
+          <span>{{ check.checkedAt | timeAgo }}</span>
+          <span>{{ check.statusCode ?? "-" }}</span>
+          <span>{{ check.responseTimeMs }}ms</span>
+          <span>
+            <span [class]="'status-badge ' + (check.isSuccess ? 'status-badge--up' : 'status-badge--down')">
+              {{ check.isSuccess ? "Success" : "Failed" }}
+            </span>
+          </span>
+          <span class="checks-table__error">{{ check.errorMessage ?? "-" }}</span>
+        </div>
+      }
+    </div>
+  </div>
+}
+
