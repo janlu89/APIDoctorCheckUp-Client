@@ -1,6 +1,5 @@
 @if (isLoading()) {
   <div class="dashboard__loading">
-    <p-progressSpinner strokeWidth="4" />
     <p>Loading dashboard...</p>
   </div>
 }
@@ -12,7 +11,6 @@
 }
 
 @if (!isLoading() && !error() && summary()) {
-  <!-- Summary bar -->
   <div class="dashboard__summary">
     <div class="summary-stat">
       <span class="summary-stat__value">{{ summary()!.totalEndpoints }}</span>
@@ -32,13 +30,13 @@
     </div>
   </div>
 
-  <!-- Endpoint grid -->
   <div class="dashboard__grid">
     @for (endpoint of endpoints(); track endpoint.id) {
-      <div class="endpoint-card"
-           [class.endpoint-card--up]="endpoint.currentStatus === EndpointStatus.Up"
-           [class.endpoint-card--degraded]="endpoint.currentStatus === EndpointStatus.Degraded"
-           [class.endpoint-card--down]="endpoint.currentStatus === EndpointStatus.Down">
+      <a class="endpoint-card"
+         [routerLink]="['/endpoints', endpoint.id]"
+         [class.endpoint-card--up]="endpoint.currentStatus === EndpointStatus.Up"
+         [class.endpoint-card--degraded]="endpoint.currentStatus === EndpointStatus.Degraded"
+         [class.endpoint-card--down]="endpoint.currentStatus === EndpointStatus.Down">
 
         <div class="endpoint-card__header">
           <span [class]="'status-badge ' + getStatusDisplay(endpoint.currentStatus).cssClass">
@@ -67,7 +65,7 @@
             <span class="endpoint-card__stat-value">{{ endpoint.lastCheckedAt | timeAgo }}</span>
           </div>
         </div>
-      </div>
+      </a>
     }
   </div>
 }

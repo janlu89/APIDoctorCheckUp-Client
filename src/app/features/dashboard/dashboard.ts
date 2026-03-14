@@ -1,40 +1,37 @@
-import { Component, inject, signal, effect, OnInit } from "@angular/core";
+import { Component, inject, signal, effect, OnInit, OnDestroy } from "@angular/core";
+import { RouterLink } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { ApiService } from "../../core/services/api.service";
 import { SignalRService } from "../../core/services/signalr.service";
-import { EndpointSummaryDto, DashboardSummaryDto, EndpointStatus } from "../../core/models/api.models";
+import {
+  EndpointSummaryDto,
+  DashboardSummaryDto,
+  EndpointStatus
+} from "../../core/models/api.models";
 import { getStatusDisplay } from "../../shared/utils/status.helpers";
 import { TimeAgoPipe } from "../../shared/pipes/time-ago.pipe";
 import { ProgressSpinnerModule } from "primeng/progressspinner";
-import { CardModule } from "primeng/card";
 
 @Component({
   selector: "app-dashboard",
   standalone: true,
-  imports: [TimeAgoPipe, ProgressSpinnerModule, CardModule],
+  imports: [RouterLink, TimeAgoPipe, ProgressSpinnerModule],
   templateUrl: "./dashboard.html",
   styleUrl: "./dashboard.css"
 })
-export class Dashboard implements OnInit {
+export class Dashboard implements OnInit, OnDestroy {
   private readonly api     = inject(ApiService);
-  private readonly signalR = inject(SignalRService);
+  protected readonly signalR = inject(SignalRService);
 
-  // All local state is held as signals so Angular knows exactly which parts
-  // of the template to update when data changes.
   readonly summary   = signal<DashboardSummaryDto | null>(null);
   readonly endpoints = signal<EndpointSummaryDto[]>([]);
   readonly isLoading = signal(true);
   readonly error     = signal<string | null>(null);
 
-  // Expose the helper so the template can call it directly.
   readonly getStatusDisplay = getStatusDisplay;
   readonly EndpointStatus   = EndpointStatus;
 
   constructor() {
-    // effect() runs whenever a signal it reads changes. Here we watch
-    // lastCheckResult — every time the SignalR service receives a new check
-    // result from the server, this effect fires and patches the matching
-    // endpoint in our local array without a full re-fetch from the API.
     effect(() => {
       const result = this.signalR.lastCheckResult();
       if (!result) return;
@@ -44,19 +41,15 @@ export class Dashboard implements OnInit {
           e.id === result.endpointId
             ? {
                 ...e,
-                currentStatus:     result.currentStatus,
+                currentStatus:      result.currentStatus,
                 lastResponseTimeMs: result.responseTimeMs,
-                lastCheckedAt:     result.checkedAt
+                lastCheckedAt:      result.checkedAt
               }
             : e
         )
       );
     });
 
-    // A second effect watches status changes specifically. The OnStatusChanged
-    // event fires only on transitions (Unknown->Up, Up->Down etc), which is a
-    // subset of OnCheckResult events. We use it to trigger the status badge
-    // transition animation by updating currentStatus directly.
     effect(() => {
       const change = this.signalR.lastStatusChanged();
       if (!change) return;
@@ -77,13 +70,20 @@ export class Dashboard implements OnInit {
       this.summary.set(summary);
       this.endpoints.set([...summary.endpoints]);
       this.isLoading.set(false);
-
-      // Connect to SignalR after the initial data is loaded so the user
-      // sees content immediately rather than waiting for the hub handshake.
       await this.signalR.connect();
     } catch {
       this.error.set("Failed to load dashboard. Is the API running?");
       this.isLoading.set(false);
     }
+  }
+
+  ngOnDestroy(): void {
+    // We do NOT disconnect SignalR here intentionally. The connection is a
+    // singleton service shared across the whole app — disconnecting when the
+    // dashboard unmounts would break the endpoint detail page which also needs
+    // the live stream. The connection stays alive for the application lifetime.
+    // What we rely on instead is that Angular destroys the component's effects
+    // automatically when the component is destroyed, so this component's signal
+    // watchers stop firing even though the underlying connection remains open.
   }
 }
